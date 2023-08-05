@@ -1,0 +1,23 @@
+version: '3'
+services:
+ app-ecommerce:
+    image: yakhub4881/app-ecommerce:latest
+    container_name: app-ecommerce-container
+    ports:
+     - 4000:80
+ db:
+    image: mariadb
+    container_name: mariadb-container
+    ports:
+     - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ecomdb
+      MYSQL_USER: ecomuser
+      MYSQL_PASSWORD: ecompassword
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db-load-script.sql:/docker-entrypoint-initdb.d/db-load-script.sql
+volumes:
+  db_data:
