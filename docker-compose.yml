@@ -8,8 +8,6 @@ services:
  db:
     image: mariadb
     container_name: mariadb-container
-    ports:
-     - 3306:3306
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
