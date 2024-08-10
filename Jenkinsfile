@@ -24,10 +24,10 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_USERNAME}:${DOCKER_PASSWORD}") {
-                            docker.image("${DOCKER_IMAGE}:latest").push()
-                        }
+            script {
+                docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_USERNAME}:${DOCKER_PASSWORD}") {
+                    def dockerImage = docker.image("${DOCKER_IMAGE}:latest")
+                    dockerImage.push('latest')
                     }
                 }
             }
