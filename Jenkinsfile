@@ -25,7 +25,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
-                        docker.withRegistry('', "${DOCKER_USERNAME}:${DOCKER_PASSWORD}") {
+                        docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_USERNAME}:${DOCKER_PASSWORD}") {
                             docker.image("${DOCKER_IMAGE}:latest").push()
                         }
                     }
