@@ -15,7 +15,7 @@ RUN git clone https://github.com/kodekloudhub/learning-app-ecommerce.git /var/ww
 RUN sed -i 's/index.html/index.php/g' /etc/httpd/conf/httpd.conf
 
 # Update database host in e-commerce application configuration
-RUN sed -i 's/172.20.1.101/13.233.18.26/g' /var/www/html/index.php
+RUN sed -i 's/172.20.1.101/15.206.73.183/g' /var/www/html/index.php
 
 EXPOSE 80
 
