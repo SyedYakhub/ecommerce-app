@@ -25,7 +25,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                    sh "docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:${TAG}"
+                    // sh "docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:${TAG}"
                     sh "docker push ${DOCKER_IMAGE}:${TAG}"
                 }
             }
@@ -33,11 +33,10 @@ pipeline {
 
         stage('Deploy to k3s') {
             steps {
-                withCredentials([ssh(credentialsId: 'k3s-Server', variable: 'K3S_KEY')]) {
-                    sshagent(credentials: ['k3s-Server']) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
-                        """
+                sshagent(['k3s-Server']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ec2-user@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
+                    """
                     }
                 }
             }
