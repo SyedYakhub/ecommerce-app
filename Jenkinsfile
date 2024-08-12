@@ -4,6 +4,7 @@ pipeline {
     environment {
         GITHUB_REPO = 'https://github.com/SyedYakhub/ecommerce-app.git'
         DOCKER_IMAGE = 'yakhub4881/app-ecommerce'
+        K3S_SERVER_IP = '13.126.135.30'
     }
 
     stages {
@@ -25,6 +26,8 @@ pipeline {
             steps {
                 withCredentials([usernameColonPassword(credentialsId: 'dockerhub', variable: 'dockerHubCreds')]) {
                     script {
+                        def DOCKER_USERNAME = dockerHubCreds.username
+                        def DOCKER_PASSWORD = dockerHubCreds.password
                         docker.withRegistry('https://index.docker.io/', "${DOCKER_USERNAME}:${DOCKER_PASSWORD}") {
                             def dockerImage = docker.image("${DOCKER_IMAGE}:latest")
                             dockerImage.push('latest')
@@ -36,11 +39,10 @@ pipeline {
 
         stage('Deploy to k3s') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'k3s-Server', keyFileVariable: '', usernameVariable: 'ec2-user')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'k3s-Server', usernameVariable: 'K3S_USERNAME', keyFileVariable: 'K3S_KEY')]) {
                     script {
                         sh """
-                        export KUBECONFIG=${KUBECONFIG_FILE}
-                        kubectl apply -f ecommerce-app-deployment.yml
+                        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${K3S_USERNAME}@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
                         """
                     }
                 }
