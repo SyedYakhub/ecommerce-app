@@ -32,7 +32,7 @@ pipeline {
 
         stage('Deploy to k3s') {
             steps {
-                sshagent(['ec2-user']) {
+                sshagent(['ec2-user (K3s-Server Credentials)']) {
                     sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.135.30 kubectl apply -f ecommerce-app-deployment.yml'
                     }
                 }
