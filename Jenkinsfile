@@ -5,6 +5,7 @@ pipeline {
         GITHUB_REPO = 'https://github.com/SyedYakhub/ecommerce-app.git'
         DOCKER_IMAGE = 'yakhub4881/app-ecommerce'
         K3S_SERVER_IP = '13.126.135.30'
+        TAG = 'latest'
     }
 
     stages {
@@ -16,9 +17,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${DOCKER_IMAGE}:latest")
-                }
+                sh "docker build -t ${DOCKER_IMAGE}:${TAG} ."
             }
         }
 
@@ -26,11 +25,9 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
-                        echo "DOCKER_USERNAME: ${DOCKER_USERNAME}"
-                        echo "DOCKER_PASSWORD: ${DOCKER_PASSWORD}"
-                        docker.withRegistry('https://index.docker.io/', [username: DOCKER_USERNAME, password: DOCKER_PASSWORD]) {
-                            def dockerImage = docker.image("${DOCKER_IMAGE}:latest")
-                            dockerImage.push('latest')
+                        docker.withRegistry('https://registry.hub.docker.com/', [credentialsId: 'dockerhub']) {
+                            def dockerImage = docker.image("${DOCKER_IMAGE}:${TAG}")
+                            dockerImage.push()
                         }
                     }
                 }
