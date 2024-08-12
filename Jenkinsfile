@@ -33,10 +33,10 @@ pipeline {
 
         stage('Deploy to k3s') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'k3s-Server', usernameVariable: 'K3S_USERNAME', keyFileVariable: 'K3S_KEY')]) {
-                    script {
+                withCredentials([file(credentialsId: 'k3s-Server', variable: 'K3S_KEY')]) {
+                    sshagent(credentials: ['k3s-Server']) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${K3S_USERNAME}@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
+                        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
                         """
                     }
                 }
