@@ -26,8 +26,7 @@ pipeline {
             steps {
                 withCredentials([usernameColonPassword(credentialsId: 'dockerhub', variable: 'dockerHubCreds')]) {
                     script {
-                        def DOCKER_USERNAME = dockerHubCreds.username
-                        def DOCKER_PASSWORD = dockerHubCreds.password
+                        def (DOCKER_USERNAME, DOCKER_PASSWORD) = dockerHubCreds.split(":")
                         docker.withRegistry('https://index.docker.io/', "${DOCKER_USERNAME}:${DOCKER_PASSWORD}") {
                             def dockerImage = docker.image("${DOCKER_IMAGE}:latest")
                             dockerImage.push('latest')
@@ -59,21 +58,3 @@ pipeline {
         }
     }
 }
-
-
-// pipeline {
-//     agent any
-
-//     stages {
-//         stage('Test Docker Credentials') {
-//             steps {
-//                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-//                     script {
-//                         echo "Docker Username: ${DOCKER_USERNAME}"
-//                         echo "Docker Password: ${DOCKER_PASSWORD}"
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
