@@ -4,7 +4,6 @@ pipeline {
     environment {
         GITHUB_REPO = 'https://github.com/SyedYakhub/ecommerce-app.git'
         DOCKER_IMAGE = 'yakhub4881/app-ecommerce'
-        K3S_SERVER_IP = '13.126.135.30'
         TAG = 'latest'
     }
 
@@ -33,10 +32,8 @@ pipeline {
 
         stage('Deploy to k3s') {
             steps {
-                sshagent(['k3s-Server']) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ec2-user@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
-                    """
+                sshagent(['ec2-user']) {
+                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.135.30 kubectl apply -f ecommerce-app-deployment.yml 'sh 'ssh -o StrictHostKeyChecking=no root@192.5.101.8 sudo docker-compose -f /root/git/docker-compose.yaml up -d'
                     }
                 }
             }
