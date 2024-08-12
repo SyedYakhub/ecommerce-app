@@ -23,7 +23,7 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                withCredentials([usernameColonPassword(credentialsId: 'dockerhub', variable: 'dockerHubCreds')]) {
                     script {
                         docker.withRegistry('https://index.docker.io/', "${DOCKER_USERNAME}:${DOCKER_PASSWORD}") {
                             def dockerImage = docker.image("${DOCKER_IMAGE}:latest")
@@ -36,7 +36,7 @@ pipeline {
 
         stage('Deploy to k3s') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'kubeconfig-file', keyFileVariable: 'KUBECONFIG_FILE', usernameVariable: 'KUBECONFIG_USERNAME')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'k3s-Server', keyFileVariable: '', usernameVariable: 'ec2-user')]) {
                     script {
                         sh """
                         export KUBECONFIG=${KUBECONFIG_FILE}
