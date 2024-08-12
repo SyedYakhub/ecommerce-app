@@ -27,14 +27,11 @@ pipeline {
                     sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
                     sh "docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:${TAG}"
                     script {
-                        def imageExists = sh(returnStdout: true, script: "docker search ${DOCKER_IMAGE} | grep ${TAG}").trim()
-                        if (imageExists == '') 
-                        {
-                            sh "docker push ${DOCKER_IMAGE}:${TAG}"
-                        } 
-                        else 
-                        {
+                        def imageExists = sh(returnStdout: true, script: "docker manifest ${DOCKER_IMAGE}:${TAG} > /dev/null 2>&1; echo $?").trim()
+                        if (imageExists == '0') {
                             echo "Image ${DOCKER_IMAGE}:${TAG} already exists in the registry, skipping push."
+                        } else {
+                            sh "docker push ${DOCKER_IMAGE}:${TAG}"
                         }
                     }
                 }
