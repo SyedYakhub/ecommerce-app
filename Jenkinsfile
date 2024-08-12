@@ -6,7 +6,6 @@ pipeline {
         DOCKER_IMAGE = 'yakhub4881/app-ecommerce'
         K3S_SERVER_IP = '13.126.135.30'
         TAG = 'latest'
-        DOCKER_PASSWORD = 'Cj@kif9966' 
     }
 
     stages {
@@ -24,8 +23,8 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub', variable: 'DOCKER_PASSWORD')]) {
-                    sh "echo $DOCKER_PASSWORD | docker login -u yakhub4881 --password-stdin"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
                     sh "docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:${TAG}"
                     sh "docker push ${DOCKER_IMAGE}:${TAG}"
                 }
