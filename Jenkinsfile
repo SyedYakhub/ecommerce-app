@@ -25,7 +25,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
-                        docker.withRegistry('https://registry.hub.docker.com/', [credentialsId: 'dockerhub']) {
+                        dockerRegistryEndpoint 'docker-hub'
+                        docker.withRegistry('https://registry.hub.docker.com/', DOCKER_USERNAME, DOCKER_PASSWORD) {
                             def dockerImage = docker.image("${DOCKER_IMAGE}:${TAG}")
                             dockerImage.push()
                         }
