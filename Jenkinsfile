@@ -33,7 +33,7 @@ pipeline {
         stage('Deploy to k3s') {
             steps {
                 sshagent(['ec2-user']) {
-                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.135.30 kubectl apply -f ecommerce-app-deployment.yml 'sh 'ssh -o StrictHostKeyChecking=no root@192.5.101.8 sudo docker-compose -f /root/git/docker-compose.yaml up -d'
+                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@13.126.135.30 kubectl apply -f ecommerce-app-deployment.yml'
                     }
                 }
             }
