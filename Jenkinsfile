@@ -26,24 +26,17 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
                     sh "docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE}:${TAG}"
-                    script {
-                        def imageExists = sh(returnStdout: true, script: "docker manifest ${DOCKER_IMAGE}:${TAG} > /dev/null 2>&1; echo $?").trim()
-                        if (imageExists == '0') {
-                            echo "Image ${DOCKER_IMAGE}:${TAG} already exists in the registry, skipping push."
-                        } else {
-                            sh "docker push ${DOCKER_IMAGE}:${TAG}"
-                        }
-                    }
+                    sh "docker push ${DOCKER_IMAGE}:${TAG}"
                 }
             }
         }
 
         stage('Deploy to k3s') {
             steps {
-                withCredentials([file(credentialsId: 'k3s-Server', variable: 'K3S_KEY')]) {
-                    sshagent(credentials: ['k3s-Server']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'k3s-Server', usernameVariable: 'K3S_USERNAME', keyFileVariable: 'K3S_KEY')]) {
+                    script {
                         sh """
-                        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
+                        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${K3S_USERNAME}@${K3S_SERVER_IP} "kubectl apply -f ecommerce-app-deployment.yml"
                         """
                     }
                 }
